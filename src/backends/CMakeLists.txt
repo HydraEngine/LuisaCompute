@@ -39,6 +39,7 @@ add_subdirectory(validation)
 
 if (LUISA_COMPUTE_ENABLE_CUDA)
     add_subdirectory(cuda)
+    add_subdirectory(vk)
 endif ()
 
 install(TARGETS luisa-compute-backends

@@ -1,5 +1,7 @@
 #pragma once
 #include "resource.h"
+#include <vulkan/vulkan.h>
+
 namespace lc::vk {
 class Stream;
 class Event : public Resource {

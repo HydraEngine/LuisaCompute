@@ -3,13 +3,8 @@
 #include "log.h"
 #include <luisa/vstl/config.h>
 #include <luisa/core/binary_file_stream.h>
-#include "compute_shader.h"
-#include "../common/hlsl/hlsl_codegen.h"
 #include "serde_type.h"
-#include "../common/hlsl/binding_to_arg.h"
 #include <luisa/runtime/context.h>
-#include "../common/hlsl/shader_compiler.h"
-#include "shader_serializer.h"
 #include "default_buffer.h"
 #include "stream.h"
 #include "event.h"
@@ -317,7 +312,7 @@ void Device::_init_device(uint32_t selectedDevice, bool fallback) {
     physical_devices.push_back_uninitialized(gpuCount);
     err = vkEnumeratePhysicalDevices(detail::vk_instance, &gpuCount, physical_devices.data());
     if (err) [[unlikely]] {
-        LUISA_ERROR("Could not enumerate physical devices : {}", err);
+        LUISA_ERROR("Could not enumerate physical devices : {}", int(err));
         return;
     }
 
@@ -427,7 +422,6 @@ BufferCreationInfo Device::create_buffer(const Type *element, size_t elem_count,
     info.total_size_bytes = ptr->byte_size();
     return info;
 }
-BufferCreationInfo Device::create_buffer(const ir::CArc<ir::Type> *element, size_t elem_count, void *external_ptr) noexcept { return BufferCreationInfo::make_invalid(); }
 void Device::destroy_buffer(uint64_t handle) noexcept {
     delete reinterpret_cast<DefaultBuffer *>(handle);
 }
@@ -479,88 +473,18 @@ void Device::dispatch(
 }
 
 // swap chain
-SwapchainCreationInfo Device::create_swapchain(
-    uint64_t window_handle, uint64_t stream_handle,
-    uint width, uint height, bool allow_hdr,
-    bool vsync, uint back_buffer_size) noexcept { return SwapchainCreationInfo{ResourceCreationInfo::make_invalid()}; }
+SwapchainCreationInfo Device::create_swapchain(const SwapchainOption &option, uint64_t stream_handle) noexcept { return SwapchainCreationInfo{ResourceCreationInfo::make_invalid()}; }
 void Device::destroy_swap_chain(uint64_t handle) noexcept {}
 void Device::present_display_in_stream(uint64_t stream_handle, uint64_t swapchain_handle, uint64_t image_handle) noexcept {}
 
 // kernel
 ShaderCreationInfo Device::create_shader(const ShaderOption &option, Function kernel) noexcept {
     ShaderCreationInfo info;
-    uint mask = 0;
-    if (option.enable_fast_math) {
-        mask |= 1;
-    }
-    if (option.enable_debug_info) {
-        mask |= 2;
-    }
-    // Clock clk;
-    auto code = hlsl::CodegenUtility{}.Codegen(kernel, option.native_include, mask, true);
-    vstd::MD5 check_md5({reinterpret_cast<uint8_t const *>(code.result.data() + code.immutableHeaderSize), code.result.size() - code.immutableHeaderSize});
-    if (option.compile_only) {
-        assert(!option.name.empty());
-        auto comp_result = Device::Compiler()->compile_compute(
-            code.result.view(),
-            true,
-            k_shader_model,
-            option.enable_fast_math,
-            true);
-        comp_result.multi_visit(
-            [&](vstd::unique_ptr<hlsl::DxcByteBlob> const &buffer) {
-                ShaderSerializer::serialize_bytecode(
-                    code.properties,
-                    check_md5,
-                    code.typeMD5,
-                    kernel.block_size(),
-                    option.name,
-                    {reinterpret_cast<const uint *>(buffer->data()), buffer->size() / sizeof(uint)},
-                    SerdeType::ByteCode,
-                    _binary_io);
-            },
-            [](auto &&err) {
-                LUISA_ERROR("Compile Error: {}", err);
-                return nullptr;
-            });
-
-    } else {
-        vstd::string_view file_name;
-        vstd::string str_cache;
-        SerdeType serde_type;
-        if (option.enable_cache) {
-            if (option.name.empty()) {
-                str_cache << check_md5.to_string(false) << ".spv"sv;
-                file_name = str_cache;
-                serde_type = SerdeType::Cache;
-            } else {
-                file_name = option.name;
-                serde_type = SerdeType::ByteCode;
-            }
-        }
-        auto shader = ComputeShader::compile(
-            _binary_io,
-            this,
-            kernel,
-            [&]() { return std::move(code); },
-            check_md5,
-            hlsl::binding_to_arg(kernel.bound_arguments()),
-            kernel.block_size(),
-            file_name,
-            serde_type,
-            k_shader_model,
-            option.enable_fast_math);
-        info.handle = reinterpret_cast<uint64_t>(shader);
-        info.native_handle = shader->pipeline();
-    }
-    info.block_size = kernel.block_size();
     return info;
 }
-ShaderCreationInfo Device::create_shader(const ShaderOption &option, const ir::KernelModule *kernel) noexcept { return ShaderCreationInfo::make_invalid(); }
 ShaderCreationInfo Device::load_shader(luisa::string_view name, luisa::span<const Type *const> arg_types) noexcept { return ShaderCreationInfo::make_invalid(); }
 Usage Device::shader_argument_usage(uint64_t handle, size_t index) noexcept { return Usage::NONE; }
 void Device::destroy_shader(uint64_t handle) noexcept {
-    delete reinterpret_cast<ComputeShader *>(handle);
 }
 
 // event
@@ -610,7 +534,7 @@ VSTL_EXPORT_C void backend_device_names(luisa::vector<luisa::string> &r) {
     physical_devices.push_back_uninitialized(gpuCount);
     auto err = vkEnumeratePhysicalDevices(detail::vk_instance, &gpuCount, physical_devices.data());
     if (err) {
-        LUISA_ERROR("Could not enumerate physical devices : {}", err);
+        LUISA_ERROR("Could not enumerate physical devices : {}", int(err));
         return;
     }
     r.reserve(physical_devices.size());
@@ -620,10 +544,7 @@ VSTL_EXPORT_C void backend_device_names(luisa::vector<luisa::string> &r) {
         r.emplace_back(_device_properties.deviceName);
     }
 }
-hlsl::ShaderCompiler *Device::Compiler() {
-    static vstd::optional<hlsl::ShaderCompiler> gDxcCompiler;
-    return gDxcCompiler.ptr();
-}
+
 VkInstance Device::instance() const {
     return detail::vk_instance;
 }

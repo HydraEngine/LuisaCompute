@@ -5,9 +5,7 @@
 #include <luisa/vstl/common.h>
 #include "../common/default_binary_io.h"
 #include "vk_allocator.h"
-namespace lc::hlsl {
-class ShaderCompiler;
-}// namespace lc::hlsl
+
 namespace lc::vk {
 using namespace luisa;
 using namespace luisa::compute;
@@ -28,7 +26,6 @@ class Device : public DeviceInterface, public vstd::IOperatorNewBase {
     void _init_device(uint32_t selectedDevice, bool fallback);
 
 public:
-    static hlsl::ShaderCompiler *Compiler();
     static VkAllocationCallbacks *alloc_callbacks();
     VkInstance instance() const;
     uint compute_warp_size() const noexcept override { return 0; }
@@ -46,7 +43,6 @@ public:
     ~Device();
     void *native_handle() const noexcept override;
     BufferCreationInfo create_buffer(const Type *element, size_t elem_count, void *external_ptr) noexcept override;
-    BufferCreationInfo create_buffer(const ir::CArc<ir::Type> *element, size_t elem_count, void *external_ptr) noexcept override;
     void destroy_buffer(uint64_t handle) noexcept override;
     auto graphics_queue() const { return _graphics_queue; }
     auto compute_queue() const { return _compute_queue; }
@@ -71,16 +67,12 @@ public:
         uint64_t stream_handle, CommandList &&list) noexcept override;
 
     // swap chain
-    SwapchainCreationInfo create_swapchain(
-        uint64_t window_handle, uint64_t stream_handle,
-        uint width, uint height, bool allow_hdr,
-        bool vsync, uint back_buffer_size) noexcept override;
+    SwapchainCreationInfo create_swapchain(const SwapchainOption &option, uint64_t stream_handle) noexcept override;
     void destroy_swap_chain(uint64_t handle) noexcept override;
     void present_display_in_stream(uint64_t stream_handle, uint64_t swapchain_handle, uint64_t image_handle) noexcept override;
 
     // kernel
     ShaderCreationInfo create_shader(const ShaderOption &option, Function kernel) noexcept override;
-    ShaderCreationInfo create_shader(const ShaderOption &option, const ir::KernelModule *kernel) noexcept override;
     ShaderCreationInfo load_shader(luisa::string_view name, luisa::span<const Type *const> arg_types) noexcept override;
     Usage shader_argument_usage(uint64_t handle, size_t index) noexcept override;
     void destroy_shader(uint64_t handle) noexcept override;

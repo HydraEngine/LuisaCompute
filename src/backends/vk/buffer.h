@@ -14,6 +14,7 @@ public:
     virtual VkBuffer vk_buffer() const = 0;
 };
 class BufferView {
+public:
     Buffer const *buffer;
     size_t offset;
     size_t size_bytes;
