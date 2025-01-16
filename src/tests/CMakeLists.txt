@@ -78,11 +78,7 @@ luisa_compute_add_executable(test_dml test_dml.cpp)
 luisa_compute_add_executable(test_cuda_dx_interop test_cuda_dx_interop.cpp)
 luisa_compute_add_executable(test_pinned_mem test_pinned_mem.cpp)
 
-if (LUISA_COMPUTE_ENABLE_CLANG_CXX)
-    luisa_compute_add_executable(clangcxx_compiler clangcxx_compiler.cpp)
-    luisa_compute_add_executable(test_clang_cxx test_clang_cxx.cpp)
-    luisa_compute_add_executable(test_path_tracing_clangcxx test_path_tracing_clangcxx.cpp)
-endif ()
+luisa_compute_add_executable(test_vulkan test_vulkan.cpp)
 
 if (LUISA_COMPUTE_ENABLE_GUI)
     luisa_compute_add_executable(test_swapchain test_swapchain.cpp)

@@ -19,6 +19,9 @@ set(LUISA_COMPUTE_VULKAN_SOURCES
         VulkanBuffer.h
         VulkanTools.cpp
         VulkanTools.h
+        vk_allocator.h
+        vk_allocator.cpp
+        default_binary_io.cpp
 )
 
 luisa_compute_add_backend(vulkan SOURCES ${LUISA_COMPUTE_VULKAN_SOURCES})
