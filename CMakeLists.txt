@@ -106,10 +106,6 @@ target_include_directories(luisa-compute-include INTERFACE
         $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>)
 target_compile_features(luisa-compute-include INTERFACE c_std_11 cxx_std_20)
 
-if (LUISA_COMPUTE_ENABLE_RUST)
-    target_compile_definitions(luisa-compute-include INTERFACE LUISA_ENABLE_IR=1)
-endif ()
-
 if (UNIX AND NOT APPLE AND LUISA_COMPUTE_ENABLE_WAYLAND)
     target_compile_definitions(luisa-compute-include INTERFACE LUISA_ENABLE_WAYLAND=1)
 endif ()

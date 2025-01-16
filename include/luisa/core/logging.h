@@ -15,9 +15,6 @@
 #include <luisa/core/stl/format.h>
 #include <luisa/core/platform.h>
 
-// forward declaration for Rust binding
-struct LCLoggerMessage;
-
 namespace luisa {
 
 using spdlog::logger;
@@ -26,7 +23,6 @@ using log_level = spdlog::level::level_enum;
 namespace detail {
 [[nodiscard]] LC_CORE_API luisa::logger &default_logger() noexcept;
 LC_CORE_API void set_sink(spdlog::sink_ptr sink) noexcept;
-LC_CORE_API spdlog::sink_ptr create_sink_with_callback(void (*callback)(LCLoggerMessage)) noexcept;
 LC_CORE_API spdlog::sink_ptr create_sink_with_callback(
     luisa::function<void(const char *level,
                          const char *message)>

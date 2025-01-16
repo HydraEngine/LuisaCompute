@@ -38,15 +38,11 @@ endif ()
 add_subdirectory(core)
 add_subdirectory(vstl)
 add_subdirectory(ast)
-add_subdirectory(rust)
 add_subdirectory(runtime)
-add_subdirectory(ir)
 add_subdirectory(dsl)
 add_subdirectory(tensor)
-add_subdirectory(osl)
 add_subdirectory(gui)
 add_subdirectory(backends)
-add_subdirectory(api)
 add_subdirectory(ir_v2)
 add_subdirectory(clangcxx)
 
@@ -57,12 +53,9 @@ target_link_libraries(compute INTERFACE
         luisa-compute-vstl
         luisa-compute-ast
         luisa-compute-dsl
-        luisa-compute-osl
         luisa-compute-runtime
         luisa-compute-gui
-        luisa-compute-api
         luisa-compute-backends
-        luisa-compute-ir
         luisa-compute-ir-v2
         luisa-compute-clangcxx)
 

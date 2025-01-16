@@ -96,14 +96,6 @@
 #include <luisa/ir/transform.h>
 #endif
 
-#include <luisa/osl/hint.h>
-#include <luisa/osl/instruction.h>
-#include <luisa/osl/literal.h>
-#include <luisa/osl/oso_parser.h>
-#include <luisa/osl/shader.h>
-#include <luisa/osl/symbol.h>
-#include <luisa/osl/type.h>
-
 #include <luisa/runtime/bindless_array.h>
 #include <luisa/runtime/buffer.h>
 #include <luisa/runtime/buffer_arena.h>
