@@ -6,7 +6,6 @@
 #include <luisa/ast/function.h>
 #include <luisa/ast/function_builder.h>
 #include <luisa/ast/constant_data.h>
-#include "../hlsl/string_builder.h"
 #include <luisa/core/mathematics.h>
 #include <luisa/core/logging.h>
 namespace luisa::compute {

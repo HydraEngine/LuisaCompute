@@ -35,7 +35,6 @@ luisa_compute_add_test(context)
 luisa_compute_add_test(dsl)
 luisa_compute_add_test(buffer_io)
 
-luisa_compute_add_executable(test_ir_v2 test_ir_v2.cpp)
 luisa_compute_add_executable(test_helloworld test_helloworld.cpp)
 luisa_compute_add_executable(test_type test_type.cpp)
 luisa_compute_add_executable(test_ast test_ast.cpp)

@@ -13,12 +13,6 @@
 #include <luisa/runtime/bindless_array.h>
 #include <luisa/runtime/dispatch_buffer.h>
 
-#ifdef LUISA_ENABLE_IR
-#include <luisa/ir/ir2ast.h>
-#include <luisa/ir/ast2ir.h>
-#include <luisa/ir/transform.h>
-#endif
-
 #include "cuda_error.h"
 #include "cuda_device.h"
 #include "cuda_buffer.h"
@@ -286,17 +280,6 @@ BufferCreationInfo CUDADevice::create_buffer(const Type *element,
         info.native_handle = reinterpret_cast<void *>(buffer->device_address());
     }
     return info;
-}
-
-BufferCreationInfo CUDADevice::create_buffer(const ir::CArc<ir::Type> *element,
-                                             size_t elem_count,
-                                             void *external_memory) noexcept {
-#ifdef LUISA_ENABLE_IR
-    auto type = IR2AST::get_type(element->get());
-    return create_buffer(type, elem_count, external_memory);
-#else
-    LUISA_ERROR_WITH_LOCATION("CUDA device does not support creating shader from IR types.");
-#endif
 }
 
 void CUDADevice::destroy_buffer(uint64_t handle) noexcept {
@@ -631,14 +614,7 @@ ShaderCreationInfo CUDADevice::_create_shader(luisa::string name,
 ShaderCreationInfo CUDADevice::create_shader(const ShaderOption &option, Function kernel) noexcept {
 
     if (kernel.propagated_builtin_callables().test(CallOp::BACKWARD)) {
-#ifdef LUISA_ENABLE_IR
-        auto ir = AST2IR::build_kernel(kernel);
-        ir->get()->module.flags |= ir::ModuleFlags_REQUIRES_REV_AD_TRANSFORM;
-        transform_ir_kernel_module_auto(ir->get());
-        return create_shader(option, ir->get());
-#else
         LUISA_ERROR_WITH_LOCATION("Please enable IR for autodiff support");
-#endif
     }
 
     // codegen
@@ -782,18 +758,6 @@ ShaderCreationInfo CUDADevice::create_shader(const ShaderOption &option, Functio
     return _create_shader(option.name, scratch.string(),
                           option, nvrtc_options,
                           metadata, std::move(bound_arguments));
-}
-
-ShaderCreationInfo CUDADevice::create_shader(const ShaderOption &option, const ir::KernelModule *kernel) noexcept {
-#ifdef LUISA_ENABLE_IR
-    Clock clk;
-    auto function = IR2AST::build(kernel);
-    LUISA_VERBOSE("IR2AST done in {} ms.", clk.toc());
-    return create_shader(option, function->function());
-#else
-    LUISA_ERROR_WITH_LOCATION("CUDA device does not support creating shader from IR types.");
-    return {};
-#endif
 }
 
 ShaderCreationInfo CUDADevice::load_shader(luisa::string_view name_in,

@@ -105,13 +105,6 @@ if (LUISA_COMPUTE_ENABLE_CPU OR
                 vulkan_instance.cpp vulkan_instance.h
                 vulkan_swapchain.cpp)
 
-        if (APPLE AND CMAKE_C_COMPILER_ID MATCHES "Clang")
-            enable_language(OBJC)
-            enable_language(OBJCXX)
-            list(APPEND LUISA_COMPUTE_VULKAN_SWAPCHAIN_SOURCES
-                    moltenvk_surface.mm)
-        endif ()
-
         add_library(luisa-compute-vulkan-swapchain OBJECT
                 ${LUISA_COMPUTE_VULKAN_SWAPCHAIN_SOURCES})
         target_link_libraries(luisa-compute-vulkan-swapchain

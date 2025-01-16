@@ -89,13 +89,6 @@
 #include <luisa/gui/window.h>
 #endif
 
-#ifdef LUISA_ENABLE_IR
-#include <luisa/ir/ast2ir.h>
-#include <luisa/ir/fwd.h>
-#include <luisa/ir/ir2ast.h>
-#include <luisa/ir/transform.h>
-#endif
-
 #include <luisa/runtime/bindless_array.h>
 #include <luisa/runtime/buffer.h>
 #include <luisa/runtime/buffer_arena.h>
@@ -115,8 +108,6 @@
 #include <luisa/runtime/raster/raster_state.h>
 #include <luisa/runtime/raster/vertex_attribute.h>
 #include <luisa/runtime/raster/viewport.h>
-#include <luisa/runtime/remote/client_interface.h>
-#include <luisa/runtime/remote/server_interface.h>
 #include <luisa/runtime/rhi/argument.h>
 #include <luisa/runtime/rhi/command.h>
 #include <luisa/runtime/rhi/command_encoder.h>
@@ -148,18 +139,6 @@
 #include <luisa/runtime/stream_event.h>
 #include <luisa/runtime/swapchain.h>
 #include <luisa/runtime/volume.h>
-
-#ifdef LUISA_ENABLE_RUST
-#include <luisa/rust/api_types.h>
-#include <luisa/rust/api_types.hpp>
-#include <luisa/rust/ir.hpp>
-#include <luisa/rust/ir_common.h>
-#endif
-
-#ifdef LUISA_ENABLE_TENSOR
-#include <luisa/tensor/scope.h>
-#include <luisa/tensor/tensor.h>
-#endif
 
 #include <luisa/vstl/allocate_type.h>
 #include <luisa/vstl/arena_hash_map.h>

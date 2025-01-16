@@ -42,7 +42,6 @@ add_subdirectory(runtime)
 add_subdirectory(dsl)
 add_subdirectory(gui)
 add_subdirectory(backends)
-add_subdirectory(ir_v2)
 
 add_library(compute INTERFACE)
 
@@ -53,8 +52,7 @@ target_link_libraries(compute INTERFACE
         luisa-compute-dsl
         luisa-compute-runtime
         luisa-compute-gui
-        luisa-compute-backends
-        luisa-compute-ir-v2)
+        luisa-compute-backends)
 
 if (LUISA_COMPUTE_ENABLE_CUDA_EXT_LCUB)
     target_link_libraries(compute INTERFACE luisa-compute-cuda-ext-lcub)
